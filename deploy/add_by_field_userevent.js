@@ -20,7 +20,7 @@
      * @description: Adds an input box to search and add an item by a custom field
      * @records: sales order, purchase order
      *
-     * @author Felipe Chang <fchang@gnln.com>
+     * @author Felipe Chang <felipechang@hardcake.org>
      *
      * @NApiVersion 2.x
      * @NModuleScope SameAccount
