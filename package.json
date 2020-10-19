@@ -1,0 +1,38 @@
+{
+  "name": "netsuite-add-by-fiel",
+  "author": "Felipe Chang <felipechang@hardcake.org>",
+  "license": "GPL-3.0",
+  "version": "0.0.1",
+  "description": "Search and add line items easily on a NetSuite Sales Order",
+  "scripts": {
+    "test": "jest",
+    "build": "node build.js"
+  },
+  "devDependencies": {
+    "@hitc/netsuite-types": "^2020.2.5",
+    "@oracle/suitecloud-unit-testing": "^1.1.0",
+    "@types/jest": "^26.0.14",
+    "@types/node": "^14.11.10",
+    "html-inline": "^1.2.0",
+    "html-webpack-inline-source-plugin": "0.0.10",
+    "jest": "^26.5.2",
+    "minify": "^6.0.0",
+    "netsuite-starter": "1.0.12"
+  },
+  "engines": {
+    "node": ">=14.13.1",
+    "npm": ">=6.14.8"
+  },
+  "homepage": "https://github.com/felipechang/netsuite-add-by-field#readme",
+  "keywords": [
+    "netsuite",
+    "sdf",
+    "typescript",
+    "suitescript",
+    "suitecloud"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/felipechang/netsuite-add-by-field.git"
+  }
+}

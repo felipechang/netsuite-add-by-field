@@ -1,0 +1,15 @@
+<div id="abd">
+    <link rel="stylesheet" href="add_by_field.css">
+    <script type="application/javascript" src="add_by_field_config.js"></script>
+    <script type="application/javascript" src="add_by_field.js"></script>
+    <div id="abd_wrapper">
+        <form onsubmit="return false">
+            <label for="add_by_field_input">Search..</label>
+            <input id="add_by_field_input" type="search" onkeyup="addByField.find()" onpaste="addByField.find()">
+        </form>
+    </div>
+    <div id="add_by_field_table">
+        <table id="add_by_field_results">
+        </table>
+    </div>
+</div>
