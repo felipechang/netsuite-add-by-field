@@ -1,17 +1,19 @@
-<div id="abd">
-    <style>#abd {
+<div id="add_by_field">
+    <style>#add_by_field {
     width: 500px;
     height: 200px;
 }
 
-#abd_wrapper {
+#add_by_field_wrapper {
     width: 100%;
-    height: 35%;
     padding-top: 10px;
+    padding-bottom: 10px;
 }
 
-#abd_input {
+#add_by_field_input {
     height: 30px;
+    margin-left: 10px;
+    padding-left: 5px;
 }
 
 #add_by_field_table {
@@ -19,16 +21,22 @@
     height: 65%;
 }
 
-.abd_entry {
-    font-size: 13px;
+#add_by_field_results {
+    width: 100%;
+}
+
+.add_by_field_entry {
     cursor: pointer;
-    color: #2d2eff;
     text-decoration: underline;
 }
 
-.abd_entry:hover {
+.add_by_field_entry:hover {
     text-decoration: none;
-    color: #555;
+    color: #292929;
+}
+
+.add_by_field_empty {
+    color: #ffffff;
 }</style>
     <script type="application/javascript">/** Configuration profile */
 const AddByFieldConfig = {
@@ -37,7 +45,7 @@ const AddByFieldConfig = {
     minTextSize: 3,
 
     /** How many items o show per page */
-    pageSize: 5,
+    pageSize: 7,
 
     /** Set to true will show only available items */
     availableOnly: true,
@@ -49,7 +57,7 @@ const AddByFieldConfig = {
     html: {
 
         /** Class for rows created */
-        rowClass: 'adb_class',
+        rowClass: 'smallgraytextnolink add_by_field_entry',
 
         /** Input field ID */
         inputId: 'add_by_field_input',
@@ -58,271 +66,282 @@ const AddByFieldConfig = {
         tableId: 'add_by_field_results',
 
         /** Pagination text next page */
-        nextText: 'Next..',
+        nextText: '..Next >',
 
         /** Pagination text previous page */
-        previousText: 'Back..',
+        previousText: '< Back..',
     }
 }</script>
-    <script type="application/javascript">class AddByField {
+    <script type="application/javascript">jQuery(document).ready(function () {
 
-    /** Start application */
-    init = function () {
-        this.configuration = AddByFieldConfig;
-        this.storage = {
-            holdRun: false,
-            currentChunk: 0,
-            lastChunk: 0,
-            currentInput: '',
-            lastInput: '',
-            place: '',
-        };
-        this.nodes = {
-            input: document.getElementById(this.configuration.html.inputId),
-            table: document.getElementById(this.configuration.html.tableId),
-        };
-        const currentRecord = require('N/currentRecord');
-        const record = currentRecord.get();
-        this.record = record;
-        this.storage.place = record.getValue({
-            fieldId: 'location'
-        });
-        console.log('Add By Field loaded...');
-    };
+    const AddByField = {
 
-    /** Fetch Next Page */
-    findNext = function () {
-        const _this = this;
-        if (!_this.validate()) {
-            return;
-        }
-        _this.storage.currentChunk += _this.configuration.pageSize;
-        _this.fetchItemField();
-    };
-
-    /** Fetch Previous Page */
-    findPrevious = function () {
-        const _this = this;
-        if (!_this.validate()) {
-            return;
-        }
-        _this.storage.currentChunk -= _this.configuration.pageSize;
-        if (_this.storage.currentChunk < 0) {
-            _this.storage.currentChunk = 0;
-        }
-        _this.fetchItemField();
-    };
-
-    /** Fetch Current Page */
-    find = function () {
-        const _this = this;
-        if (!_this.validate()) {
-            return;
-        }
-        _this.storage.currentChunk = 0;
-        _this.fetchItemField();
-    };
-
-    /** Insert a line item */
-    insertItem = function (item) {
-        const _this = this;
-        const line = _this.record.findSublistLineWithValue({
-            sublistId: 'item',
-            fieldId: 'item',
-            value: item
-        });
-        if (line !== -1) {
-            _this.record.selectLine({
-                sublistId: 'item',
-                line: line
+        /** Start application */
+        init: function () {
+            this.configuration = AddByFieldConfig;
+            this.storage = {
+                holdRun: false,
+                currentChunk: 0,
+                lastChunk: -1,
+                currentInput: '',
+                lastInput: '',
+                place: '',
+            };
+            this.nodes = {
+                input: document.getElementById(this.configuration.html.inputId),
+                table: document.getElementById(this.configuration.html.tableId),
+            };
+            require(['N/currentRecord'], (currentRecord) => {
+                const record = currentRecord.get();
+                this.record = record;
+                this.storage.place = record.getValue({
+                    fieldId: 'location'
+                });
+                console.info('Add By Field loaded...');
             });
-            const qty = Number(_this.record.getCurrentSublistValue({
-                sublistId: 'item',
-                fieldId: 'quantity'
-            }));
-            _this.record.setCurrentSublistValue({
-                sublistId: 'item',
-                fieldId: 'quantity',
-                value: (qty + 1)
-            });
-        } else {
-            const count = _this.record.getLineCount({
-                sublistId: 'item'
-            });
-            _this.record.insertLine({
-                sublistId: 'item',
-                line: count
-            });
-            _this.record.setCurrentSublistValue({
+        },
+
+        /** Fetch Next Page */
+        findNext: function () {
+            if (!AddByField.validate()) {
+                return;
+            }
+            AddByField.storage.currentChunk += AddByField.configuration.pageSize;
+            AddByField.fetchItemField();
+        },
+
+        /** Fetch Previous Page */
+        findPrevious: function () {
+            if (!AddByField.validate()) {
+                return;
+            }
+            AddByField.storage.currentChunk -= AddByField.configuration.pageSize;
+            if (AddByField.storage.currentChunk < 0) {
+                AddByField.storage.currentChunk = 0;
+            }
+            AddByField.fetchItemField();
+        },
+
+        /** Fetch Current Page */
+        find: function () {
+            if (!AddByField.validate()) {
+                return;
+            }
+            AddByField.storage.currentChunk = 0;
+            AddByField.fetchItemField();
+        },
+
+        /** Insert a line item */
+        insertItem: function (item) {
+            const line = AddByField.record.findSublistLineWithValue({
                 sublistId: 'item',
                 fieldId: 'item',
                 value: item
             });
-            _this.record.setCurrentSublistValue({
-                sublistId: 'item',
-                fieldId: 'quantity',
-                value: 1
-            });
-        }
-        _this.record.commitLine({
-            sublistId: 'item'
-        });
-    };
-
-    /** Split input by words and return a filter array */
-    getSearchFilters = function () {
-        const search = require('N/search');
-        const _this = this;
-        const input = _this.storage.currentInput;
-        const place = _this.storage.place;
-        const name = _this.configuration.lookUpField;
-        const filters = [{
-            name: 'type',
-            operator: search.Operator.ANYOF,
-            values: ['InvtPart', 'Kit']
-        }, {
-            name: 'isinactive',
-            operator: search.Operator.IS,
-            values: ['F']
-        }, {
-            name: 'matrix',
-            operator: search.Operator.IS,
-            values: ['F']
-        }, {
-            name: 'inventorylocation',
-            operator: search.Operator.ANYOF,
-            values: [place]
-        }];
-        if (_this.configuration.availableOnly) {
-            filters.push({
-                name: 'locationquantityavailable',
-                operator: search.Operator.GREATERTHAN,
-                values: ['0']
-            });
-        }
-        const inputArr = input.split(' ');
-        inputArr.map(function (item) {
-            if (!item) {
-                return;
+            if (line !== -1) {
+                AddByField.record.selectLine({
+                    sublistId: 'item',
+                    line: line
+                });
+                const qty = Number(AddByField.record.getCurrentSublistValue({
+                    sublistId: 'item',
+                    fieldId: 'quantity'
+                }));
+                AddByField.record.setCurrentSublistValue({
+                    sublistId: 'item',
+                    fieldId: 'quantity',
+                    value: (qty + 1)
+                });
+            } else {
+                const count = AddByField.record.getLineCount({
+                    sublistId: 'item'
+                });
+                AddByField.record.insertLine({
+                    sublistId: 'item',
+                    line: count
+                });
+                AddByField.record.setCurrentSublistValue({
+                    sublistId: 'item',
+                    fieldId: 'item',
+                    value: item
+                });
+                AddByField.record.setCurrentSublistValue({
+                    sublistId: 'item',
+                    fieldId: 'quantity',
+                    value: 1
+                });
             }
-            filters.push({
-                name: name,
-                operator: search.Operator.CONTAINS,
-                values: [item]
+            AddByField.record.commitLine({
+                sublistId: 'item'
             });
-        });
-        return filters;
-    };
+        },
 
-    /** Validate what we need to run */
-    validate = function () {
-        const _this = this;
-        if (_this.storage.holdRun) {
-            return false;
-        }
-        if (!_this.storage.place) {
-            return false;
-        }
-        if (!_this.nodes.input) {
-            return false;
-        }
-        if (!_this.nodes.table) {
-            return false;
-        }
-        _this.storage.currentInput = (_this.nodes.input.nodeValue || '').trim();
-        if (_this.storage.currentInput.length < _this.configuration.minTextSize) {
-            return false;
-        }
-        const sameInput = _this.storage.currentInput === _this.storage.lastInput;
-        const sameChunk = _this.storage.currentChunk === _this.storage.lastChunk;
-        return !(sameInput || sameChunk);
-    };
-
-    /** Build row line string */
-    buildLine = function (action, text) {
-        const _this = this;
-        return '<span class=\'' + _this.configuration.rowClass + '\' onclick=\'' + action + '\'>' + text + '</span>';
-    };
-
-    /** Add result row to table */
-    addResult = function (result) {
-        const _this = this;
-        const id = result.id;
-        const name = result.getValue({
-            name: 'itemid'
-        });
-        const qty = Number(result.getValue({
-            name: 'locationquantityavailable'
-        }));
-        const row = _this.nodes.table.insertRow(-1);
-        const cell = row.insertCell(0);
-        cell.innerHTML = _this.buildLine('addByField.insertItem(' + id + ')', name + ' (' + qty + ')');
-    };
-
-    /** Query and get item information */
-    fetchItemField = function () {
-        const search = require('N/search');
-        const _this = this;
-        _this.storage.holdRun = true;
-        // Clear Table
-        _this.nodes.table.innerHTML = '';
-        const searchPromise = search.create.promise({
-            type: search.Type.ITEM,
-            filters: _this.getSearchFilters(),
-            columns: [
-                {name: 'itemid', sort: search.Sort.ASC},
-                {name: 'locationquantityavailable'}
-            ]
-        });
-        searchPromise.then(function (search) {
-            const range = search.run();
-            const rangePromise = range.getRange.promise({
-                start: _this.storage.currentChunk,
-                end: (_this.storage.currentChunk + _this.configuration.pageSize)
+        /** Split input by words and return a filter array */
+        getSearchFilters: function (search) {
+            const input = AddByField.storage.currentInput;
+            const place = AddByField.storage.place;
+            const name = AddByField.configuration.lookUpField;
+            const filters = [{
+                name: 'type',
+                operator: search.Operator.ANYOF,
+                values: ['InvtPart', 'Kit']
+            }, {
+                name: 'isinactive',
+                operator: search.Operator.IS,
+                values: ['F']
+            }, {
+                name: 'matrix',
+                operator: search.Operator.IS,
+                values: ['F']
+            }, {
+                name: 'inventorylocation',
+                operator: search.Operator.ANYOF,
+                values: [place]
+            }];
+            if (AddByField.configuration.availableOnly) {
+                filters.push({
+                    name: 'locationquantityavailable',
+                    operator: search.Operator.GREATERTHAN,
+                    values: ['0']
+                });
+            }
+            const inputArr = input.split(' ');
+            inputArr.map(function (item) {
+                if (!item) {
+                    return;
+                }
+                filters.push({
+                    name: name,
+                    operator: search.Operator.CONTAINS,
+                    values: [item]
+                });
             });
-            let resultCount = 0;
-            rangePromise.catch(function (e) {
-                console.error(e);
-                _this.storage.holdRun = false;
-            });
-            rangePromise.then(function (results) {
-                results.map(_this.addResult);
-                resultCount = results.length;
-            });
-            rangePromise.finally(function () {
-                _this.insertFooterRow(resultCount);
-                _this.storage.holdRun = false;
-            });
-        });
-        searchPromise.catch(function (e) {
-            console.error(e);
-            _this.storage.holdRun = false;
-        });
-    };
 
-    /** Insert table footer row */
-    insertFooterRow = function (resultCount) {
-        const _this = this;
-        const finalRow = _this.nodes.table.insertRow(-1);
-        // Counter is not zero insert back button
-        if (_this.storage.currentChunk !== 0) {
-            const backCel = finalRow.insertCell(0);
-            backCel.innerHTML = _this.buildLine('addByField.findPrevious()', this.configuration.html.previousText);
-        }
-        // If not at the end insert next button
-        if (resultCount === _this.configuration.pageSize) {
+            return filters;
+        },
+
+        /** Validate what we need to run */
+        validate: function () {
+            if (AddByField.storage.holdRun) {
+                return false;
+            }
+            if (!AddByField.storage.place) {
+                return false;
+            }
+            if (!AddByField.nodes.input) {
+                return false;
+            }
+            if (!AddByField.nodes.table) {
+                return false;
+            }
+            AddByField.storage.currentInput = (AddByField.nodes.input.value || '').trim();
+            if (AddByField.storage.currentInput.length < AddByField.configuration.minTextSize) {
+                return false;
+            }
+            const sameInput = AddByField.storage.currentInput === AddByField.storage.lastInput;
+            const sameChunk = AddByField.storage.currentChunk === AddByField.storage.lastChunk;
+            return !(sameInput || sameChunk);
+        },
+
+        /** Build row line string */
+        buildLine: function (action, text) {
+            return '<span class=' + AddByField.configuration.html.rowClass + ' onclick=' + action + '>' + text + '</span>';
+        },
+
+        /** Add result row to table */
+        addResult: function (result) {
+            const id = result.id;
+            const name = result.getValue({
+                name: 'itemid'
+            });
+            const qty = Number(result.getValue({
+                name: 'locationquantityavailable'
+            }));
+            const row = AddByField.nodes.table.insertRow(-1);
+            const cell = row.insertCell(0);
+            cell.innerHTML = AddByField.buildLine('document.addByField.insertItem(' + id + ')', name + ' (' + qty + ')');
+        },
+
+        /** Add result row to table */
+        addEmpty: function () {
+            const row = AddByField.nodes.table.insertRow(-1);
+            const cell = row.insertCell(0);
+            const emptyClass = 'add_by_field_empty';
+            cell.innerHTML = '<span class=' + emptyClass + '>_</span>';
+        },
+
+        /** Query and get item information */
+        fetchItemField: function () {
+            require(['N/search'], (search) => {
+                AddByField.storage.holdRun = true;
+                // Clear Table
+                AddByField.nodes.table.innerHTML = '';
+                const searchPromise = search.create.promise({
+                    type: search.Type.ITEM,
+                    filters: AddByField.getSearchFilters(search),
+                    columns: [
+                        {name: 'itemid', sort: search.Sort.ASC},
+                        {name: 'locationquantityavailable'}
+                    ]
+                });
+                searchPromise.then(function (search) {
+                    const range = search.run();
+                    const rangePromise = range.getRange.promise({
+                        start: AddByField.storage.currentChunk,
+                        end: (AddByField.storage.currentChunk + AddByField.configuration.pageSize)
+                    });
+                    let resultCount = 0;
+                    rangePromise.catch(function (e) {
+                        console.error(e);
+                        AddByField.storage.holdRun = false;
+                    });
+                    rangePromise.then(function (results) {
+                        results.map(AddByField.addResult);
+                        resultCount = results.length;
+                    });
+                    rangePromise.finally(function () {
+                        for (let i = 0; i < (AddByField.configuration.pageSize - resultCount); i++) {
+                            AddByField.addEmpty();
+                        }
+                        AddByField.insertFooterRow(resultCount);
+                        AddByField.storage.holdRun = false;
+                    });
+                });
+                searchPromise.catch(function (e) {
+                    console.error(e);
+                    AddByField.storage.holdRun = false;
+                });
+            });
+        },
+
+        /** Insert table footer row */
+        insertFooterRow: function (resultCount) {
+            const finalRow = AddByField.nodes.table.insertRow(-1);
             const nextCel = finalRow.insertCell(0);
-            nextCel.innerHTML = _this.buildLine('addByField.findNext()', this.configuration.html.nextText);
-        }
-    };
-}
+            let innerHTML = "";
 
-const addByField = new AddByField();
-addByField.init();</script>
-    <div id="abd_wrapper">
+            // Counter is not zero insert back button
+            if (AddByField.storage.currentChunk !== 0) {
+                innerHTML += AddByField.buildLine('document.addByField.findPrevious()', this.configuration.html.previousText);
+            }
+            // If not at the end insert next button
+            if (resultCount === AddByField.configuration.pageSize) {
+                innerHTML += AddByField.buildLine('document.addByField.findNext()', this.configuration.html.nextText);
+            }
+
+            nextCel.innerHTML = innerHTML
+        },
+    }
+
+    document.addByField = AddByField;
+    document.addByField.init();
+});
+
+</script>
+    <div id="add_by_field_wrapper">
         <form onsubmit="return false">
-            <label for="add_by_field_input">Search..</label>
-            <input id="add_by_field_input" type="search" onkeyup="addByField.find()" onpaste="addByField.find()">
+            <label for="add_by_field_input">Find: </label>
+            <input id="add_by_field_input" type="search" onkeyup="document.addByField.find()" onpaste="document.addByField.find()">
         </form>
     </div>
     <div id="add_by_field_table">

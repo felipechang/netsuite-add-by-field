@@ -1,16 +1,18 @@
-#abd {
+#add_by_field {
     width: 500px;
     height: 200px;
 }
 
-#abd_wrapper {
+#add_by_field_wrapper {
     width: 100%;
-    height: 35%;
     padding-top: 10px;
+    padding-bottom: 10px;
 }
 
-#abd_input {
+#add_by_field_input {
     height: 30px;
+    margin-left: 10px;
+    padding-left: 5px;
 }
 
 #add_by_field_table {
@@ -18,14 +20,20 @@
     height: 65%;
 }
 
-.abd_entry {
-    font-size: 13px;
+#add_by_field_results {
+    width: 100%;
+}
+
+.add_by_field_entry {
     cursor: pointer;
-    color: #2d2eff;
     text-decoration: underline;
 }
 
-.abd_entry:hover {
+.add_by_field_entry:hover {
     text-decoration: none;
-    color: #555;
+    color: #292929;
+}
+
+.add_by_field_empty {
+    color: #ffffff;
 }

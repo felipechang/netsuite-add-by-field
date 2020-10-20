@@ -5,7 +5,7 @@ const AddByFieldConfig = {
     minTextSize: 3,
 
     /** How many items o show per page */
-    pageSize: 5,
+    pageSize: 7,
 
     /** Set to true will show only available items */
     availableOnly: true,
@@ -17,7 +17,7 @@ const AddByFieldConfig = {
     html: {
 
         /** Class for rows created */
-        rowClass: 'adb_class',
+        rowClass: 'smallgraytextnolink add_by_field_entry',
 
         /** Input field ID */
         inputId: 'add_by_field_input',
@@ -26,9 +26,9 @@ const AddByFieldConfig = {
         tableId: 'add_by_field_results',
 
         /** Pagination text next page */
-        nextText: 'Next..',
+        nextText: '..Next >',
 
         /** Pagination text previous page */
-        previousText: 'Back..',
+        previousText: '< Back..',
     }
 }

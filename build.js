@@ -41,6 +41,11 @@ sequentialExecution(
             minify("source/temp/out.html", {
                 html: {
                     removeAttributeQuotes: false,
+                },
+                js:{
+                    format: {
+                        preamble: "/* minified */"
+                    }
                 }
             })
                 .then((out) => {
