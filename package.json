@@ -9,13 +9,13 @@
     "build": "node build.js"
   },
   "devDependencies": {
-    "@hitc/netsuite-types": "^2020.2.5",
+    "@hitc/netsuite-types": "^2020.2.7",
     "@oracle/suitecloud-unit-testing": "^1.1.0",
-    "@types/jest": "^26.0.14",
-    "@types/node": "^14.11.10",
+    "@types/jest": "^26.0.15",
+    "@types/node": "^14.14.3",
     "html-inline": "^1.2.0",
     "html-webpack-inline-source-plugin": "0.0.10",
-    "jest": "^26.5.2",
+    "jest": "^26.6.1",
     "minify": "^6.0.0",
     "netsuite-starter": "1.0.12"
   },

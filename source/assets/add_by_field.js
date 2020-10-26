@@ -6,7 +6,6 @@ jQuery(document).ready(function () {
         init: function () {
             this.configuration = AddByFieldConfig;
             this.storage = {
-                holdRun: false,
                 currentChunk: 0,
                 lastChunk: -1,
                 currentInput: '',
@@ -148,9 +147,6 @@ jQuery(document).ready(function () {
 
         /** Validate what we need to run */
         validate: function () {
-            if (AddByField.storage.holdRun) {
-                return false;
-            }
             if (!AddByField.storage.place) {
                 return false;
             }
@@ -199,9 +195,6 @@ jQuery(document).ready(function () {
         /** Query and get item information */
         fetchItemField: function () {
             require(['N/search'], (search) => {
-                AddByField.storage.holdRun = true;
-                // Clear Table
-                AddByField.nodes.table.innerHTML = '';
                 const searchPromise = search.create.promise({
                     type: search.Type.ITEM,
                     filters: AddByField.getSearchFilters(search),
@@ -219,9 +212,10 @@ jQuery(document).ready(function () {
                     let resultCount = 0;
                     rangePromise.catch(function (e) {
                         console.error(e);
-                        AddByField.storage.holdRun = false;
                     });
                     rangePromise.then(function (results) {
+                        // Clear Table
+                        AddByField.nodes.table.innerHTML = '';
                         results.map(AddByField.addResult);
                         resultCount = results.length;
                     });
@@ -230,12 +224,10 @@ jQuery(document).ready(function () {
                             AddByField.addEmpty();
                         }
                         AddByField.insertFooterRow(resultCount);
-                        AddByField.storage.holdRun = false;
                     });
                 });
                 searchPromise.catch(function (e) {
                     console.error(e);
-                    AddByField.storage.holdRun = false;
                 });
             });
         },
